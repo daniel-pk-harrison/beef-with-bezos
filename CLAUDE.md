@@ -40,10 +40,16 @@ To add a new KV provider, implement the `KVStore` interface and update `lib/kv/i
 - **Admin Panel**: Fully client-side with auth check, login flow, and CRUD operations (`app/admin/page.tsx`)
 - **Path Aliases**: Use `@/` for imports from root (e.g., `@/lib/kv`, `@/components/Counter`)
 
-### Styling
+### Styling & Theme System
 
 - Tailwind CSS with custom `rage` color palette (red tones in `tailwind.config.ts`)
 - Framer Motion for animations throughout UI components
+- **Comprehensive Theme System** with 18 themes (5 standard, 13 "unhinged")
+  - See `docs/THEME_SYSTEM.md` for full documentation
+  - Theme files: `lib/theme/` (types, context, hooks, theme definitions)
+  - Theme UI: `components/theme/` (ThemeSwitcher, CanvasEffects)
+  - CSS effects: `app/globals.css` (scanlines, glitch, neon, rainbow, etc.)
+  - Floating theme picker button (bottom-right) opens gallery modal
 
 ### Environment Variables
 

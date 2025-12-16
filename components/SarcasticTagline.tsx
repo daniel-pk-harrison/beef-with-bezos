@@ -1,27 +1,29 @@
-"use client";
+'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState, useMemo } from "react";
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useMemo } from 'react';
+import { useTheme, useThemeTaglines } from '@/lib/theme/hooks';
 
 interface SarcasticTaglineProps {
   count: number;
 }
 
-const getTaglines = (count: number): string[] => {
+// Default taglines when theme doesn't provide its own
+const getDefaultTaglines = (count: number): string[] => {
   if (count === 0) {
     return [
-      "No misses yet. Bezos is watching.",
-      "A clean slate... for now.",
-      "The calm before the storm.",
+      'No misses yet. Bezos is watching.',
+      'A clean slate... for now.',
+      'The calm before the storm.',
     ];
   }
 
   if (count === 1) {
     return [
-      "And so it begins...",
-      "First blood. There will be more.",
-      "One package. One betrayal.",
-      "The first of many.",
+      'And so it begins...',
+      'First blood. There will be more.',
+      'One package. One betrayal.',
+      'The first of many.',
     ];
   }
 
@@ -68,18 +70,25 @@ const getTaglines = (count: number): string[] => {
 };
 
 export function SarcasticTagline({ count }: SarcasticTaglineProps) {
-  const [currentTagline, setCurrentTagline] = useState("");
+  const [currentTagline, setCurrentTagline] = useState('');
   const [taglineIndex, setTaglineIndex] = useState(0);
+  const { theme } = useTheme();
+  const themeTaglines = useThemeTaglines(count);
 
-  // Memoize taglines to prevent unnecessary recalculations
-  const taglines = useMemo(() => getTaglines(count), [count]);
+  // Combine theme taglines with defaults, preferring theme ones
+  const taglines = useMemo(() => {
+    if (themeTaglines.length > 0) {
+      return themeTaglines;
+    }
+    return getDefaultTaglines(count);
+  }, [count, themeTaglines]);
 
   useEffect(() => {
     // Set initial tagline
     setCurrentTagline(taglines[0]);
     setTaglineIndex(0);
 
-    // Rotate taglines every 5 seconds
+    // Rotate taglines every 5 seconds (or theme-specified interval)
     const interval = setInterval(() => {
       setTaglineIndex((prev) => {
         const next = (prev + 1) % taglines.length;
@@ -91,16 +100,41 @@ export function SarcasticTagline({ count }: SarcasticTaglineProps) {
     return () => clearInterval(interval);
   }, [taglines]);
 
+  // Determine animation based on theme
+  const getAnimation = () => {
+    if (theme.animations.typewriter) {
+      return {
+        initial: { opacity: 0, width: 0 },
+        animate: { opacity: 1, width: 'auto' },
+        exit: { opacity: 0 },
+      };
+    }
+    return {
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, y: -20 },
+    };
+  };
+
+  const animation = getAnimation();
+
   return (
     <div className="h-16 md:h-20 flex items-center justify-center">
       <AnimatePresence mode="wait">
         <motion.p
           key={currentTagline}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          {...animation}
           transition={{ duration: 0.5 }}
-          className="text-lg md:text-2xl text-rage-300/80 text-center font-medium italic px-4"
+          className={`text-lg md:text-2xl text-center font-medium italic px-4 ${
+            theme.animations.typewriter ? 'overflow-hidden whitespace-nowrap' : ''
+          }`}
+          style={{
+            color: theme.colors.primary[300],
+            fontFamily: theme.fonts.body,
+            textShadow: theme.effects.neonGlow
+              ? `0 0 10px ${theme.colors.glow}, 0 0 20px ${theme.colors.glow}`
+              : undefined,
+          }}
         >
           &ldquo;{currentTagline}&rdquo;
         </motion.p>
