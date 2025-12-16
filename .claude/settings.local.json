@@ -16,7 +16,11 @@
       "Bash(git -C /mnt/c/dev/beef-with-bezos status)",
       "Bash(test:*)",
       "Bash(npm uninstall:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git -C /mnt/c/dev/beef-with-bezos remote:*)",
+      "Bash(sudo apt install:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

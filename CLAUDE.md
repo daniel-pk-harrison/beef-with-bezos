@@ -11,6 +11,9 @@ This is "Beef with Bezos" - a Next.js 14 web app that publicly tracks Amazon mis
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run lint` - Run ESLint
+- `npm run test` - Run tests with Vitest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run typecheck` - TypeScript type checking
 
 ## Architecture
 
