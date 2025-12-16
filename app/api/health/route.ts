@@ -14,7 +14,6 @@ export async function GET() {
     return NextResponse.json({
       status: "healthy",
       timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
       checks: {
         database: {
           status: "connected",
@@ -31,7 +30,7 @@ export async function GET() {
         checks: {
           database: {
             status: "error",
-            error: error instanceof Error ? error.message : "Unknown error",
+            message: "Database connection failed",
           },
         },
       },

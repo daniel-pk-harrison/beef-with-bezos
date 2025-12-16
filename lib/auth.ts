@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
 const AUTH_COOKIE_NAME = "beef-auth";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 /**
  * Get the admin password from environment.

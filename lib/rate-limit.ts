@@ -1,20 +1,28 @@
 /**
- * Simple in-memory rate limiter for login attempts.
- * In production with multiple instances, consider using Vercel KV for distributed rate limiting.
+ * In-memory rate limiter for login attempts.
+ *
+ * LIMITATION: In serverless environments (Vercel), each function instance has its own
+ * memory. This means rate limits are per-instance, not global. An attacker could
+ * potentially bypass rate limiting by getting routed to different instances.
+ *
+ * For this app, this is acceptable because:
+ * 1. Vercel tends to reuse warm instances, so most requests hit the same instance
+ * 2. The admin password should be strong (12+ chars recommended)
+ * 3. The attack surface is limited (only /api/admin/login endpoint)
  */
+
+// Configuration
+const MAX_ATTEMPTS = 5; // Maximum login attempts
+const WINDOW_MS = 15 * 60 * 1000; // 15 minute window
+const LOCKOUT_MS = 30 * 60 * 1000; // 30 minute lockout after max attempts
 
 interface RateLimitEntry {
   count: number;
   resetTime: number;
 }
 
-// Store rate limit data in memory
+// In-memory store (per serverless instance)
 const rateLimitStore = new Map<string, RateLimitEntry>();
-
-// Configuration
-const MAX_ATTEMPTS = 5; // Maximum login attempts
-const WINDOW_MS = 15 * 60 * 1000; // 15 minute window
-const LOCKOUT_MS = 30 * 60 * 1000; // 30 minute lockout after max attempts
 
 /**
  * Clean up expired entries periodically to prevent memory leaks.
@@ -28,7 +36,7 @@ function cleanupExpiredEntries(): void {
   }
 }
 
-// Run cleanup every 5 minutes
+// Run cleanup every 5 minutes (only in long-running processes)
 if (typeof setInterval !== "undefined") {
   setInterval(cleanupExpiredEntries, 5 * 60 * 1000);
 }
@@ -62,7 +70,7 @@ export interface RateLimitResult {
 /**
  * Check if a login attempt is allowed for the given identifier.
  */
-export function checkRateLimit(identifier: string): RateLimitResult {
+export async function checkRateLimit(identifier: string): Promise<RateLimitResult> {
   const now = Date.now();
   const entry = rateLimitStore.get(identifier);
 
@@ -122,6 +130,6 @@ export function checkRateLimit(identifier: string): RateLimitResult {
 /**
  * Reset rate limit for an identifier (e.g., after successful login).
  */
-export function resetRateLimit(identifier: string): void {
+export async function resetRateLimit(identifier: string): Promise<void> {
   rateLimitStore.delete(identifier);
 }

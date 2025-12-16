@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     // Check rate limit
     const clientId = getClientIdentifier(request);
-    const rateLimit = checkRateLimit(clientId);
+    const rateLimit = await checkRateLimit(clientId);
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     // Successful login - reset rate limit and set cookie
-    resetRateLimit(clientId);
+    await resetRateLimit(clientId);
     await setAuthCookie();
 
     return NextResponse.json({ success: true });
