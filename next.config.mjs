@@ -1,5 +1,28 @@
+import { readFileSync } from "fs";
+import { execSync } from "child_process";
+
+// Get version from package.json
+const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
+const version = packageJson.version;
+
+// Get commit SHA: use GITHUB_SHA in CI, or git rev-parse locally
+const getCommitSha = () => {
+  if (process.env.GITHUB_SHA) {
+    return process.env.GITHUB_SHA.slice(0, 7);
+  }
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+};
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_VERSION: version,
+    NEXT_PUBLIC_COMMIT_SHA: getCommitSha(),
+  },
   async headers() {
     return [
       {
