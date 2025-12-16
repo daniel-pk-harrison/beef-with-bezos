@@ -98,7 +98,10 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
         transition={{ delay: 0.5 }}
         className="mt-8 sm:mt-0 sm:absolute sm:bottom-4 text-center text-white/30 text-xs pb-4 sm:pb-0"
       >
-        Tracking the chaos, one missed delivery at a time.
+        <p>Tracking the chaos, one missed delivery at a time.</p>
+        <p className="mt-1 text-white/20">
+          v{process.env.NEXT_PUBLIC_VERSION} ({process.env.NEXT_PUBLIC_COMMIT_SHA})
+        </p>
       </motion.footer>
     </main>
   );
