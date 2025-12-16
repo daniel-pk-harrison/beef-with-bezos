@@ -8,6 +8,7 @@ interface MissCardProps {
   index: number;
   onDelete?: (id: string) => void;
   showDelete?: boolean;
+  disabled?: boolean;
 }
 
 function formatDate(dateString: string): string {
@@ -33,7 +34,13 @@ function getRelativeTime(dateString: string): string {
   return `${Math.floor(diffDays / 365)} years ago`;
 }
 
-export function MissCard({ miss, index, onDelete, showDelete }: MissCardProps) {
+export function MissCard({
+  miss,
+  index,
+  onDelete,
+  showDelete,
+  disabled,
+}: MissCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -47,7 +54,9 @@ export function MissCard({ miss, index, onDelete, showDelete }: MissCardProps) {
             <span className="text-rage-400 font-mono text-sm">
               #{index + 1}
             </span>
-            <span className="text-white/60 text-sm">{formatDate(miss.date)}</span>
+            <span className="text-white/60 text-sm">
+              {formatDate(miss.date)}
+            </span>
             <span className="text-white/40 text-xs">
               ({getRelativeTime(miss.date)})
             </span>
@@ -63,7 +72,8 @@ export function MissCard({ miss, index, onDelete, showDelete }: MissCardProps) {
         {showDelete && onDelete && (
           <button
             onClick={() => onDelete(miss.id)}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-rage-400 hover:text-rage-300 text-sm px-2 py-1 rounded hover:bg-rage-900/30"
+            disabled={disabled}
+            className="opacity-0 group-hover:opacity-100 transition-opacity text-rage-400 hover:text-rage-300 text-sm px-2 py-1 rounded hover:bg-rage-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Delete
           </button>

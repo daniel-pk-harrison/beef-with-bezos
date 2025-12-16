@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { AddMissForm } from "@/components/AddMissForm";
 import { MissCard } from "@/components/MissCard";
 import type { MissedDelivery } from "@/types";
+import {
+  getMissesAction,
+  checkAuthAction,
+  loginAction,
+  logoutAction,
+  deleteMissAction,
+} from "@/lib/actions";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -14,6 +21,7 @@ export default function AdminPage() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [misses, setMisses] = useState<MissedDelivery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
   // Check auth status on mount
   useEffect(() => {
@@ -28,26 +36,21 @@ export default function AdminPage() {
   }, [isAuthenticated]);
 
   const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/admin/check");
-      const data = await res.json();
-      setIsAuthenticated(data.authenticated);
-    } catch {
+    const result = await checkAuthAction();
+    if (result.success) {
+      setIsAuthenticated(result.data);
+    } else {
       setIsAuthenticated(false);
     }
   };
 
   const fetchMisses = async () => {
     setIsLoading(true);
-    try {
-      const res = await fetch("/api/misses");
-      const data = await res.json();
-      setMisses(data.misses || []);
-    } catch (error) {
-      console.error("Failed to fetch misses:", error);
-    } finally {
-      setIsLoading(false);
+    const result = await getMissesAction();
+    if (result.success) {
+      setMisses(result.data);
     }
+    setIsLoading(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -55,67 +58,46 @@ export default function AdminPage() {
     setLoginError("");
     setIsLoggingIn(true);
 
-    try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
+    const result = await loginAction(password);
 
-      if (res.ok) {
-        setIsAuthenticated(true);
-        setPassword("");
-      } else {
-        const data = await res.json();
-        setLoginError(data.error || "Invalid password");
-      }
-    } catch {
-      setLoginError("Login failed. Please try again.");
-    } finally {
-      setIsLoggingIn(false);
+    if (!result.success) {
+      setLoginError(result.error);
+    } else if (result.data.authenticated) {
+      setIsAuthenticated(true);
+      setPassword("");
+    } else {
+      const remaining = result.data.remaining;
+      setLoginError(
+        remaining !== undefined
+          ? `Invalid password. ${remaining} attempts remaining.`
+          : "Invalid password"
+      );
     }
+
+    setIsLoggingIn(false);
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/admin/logout", { method: "POST" });
+    const result = await logoutAction();
+    if (result.success) {
       setIsAuthenticated(false);
       setMisses([]);
-    } catch (error) {
-      console.error("Logout failed:", error);
     }
   };
 
-  const handleAddMiss = useCallback(async (date: string, note: string) => {
-    const res = await fetch("/api/admin/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, note }),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || "Failed to add miss");
-    }
-
-    // Refresh the list
+  const handleAddMiss = useCallback(async () => {
+    // AddMissForm calls the action directly
+    // This callback just refreshes the list
     await fetchMisses();
   }, []);
 
-  const handleDeleteMiss = useCallback(async (id: string) => {
-    try {
-      const res = await fetch("/api/admin/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-
-      if (res.ok) {
+  const handleDeleteMiss = useCallback((id: string) => {
+    startTransition(async () => {
+      const result = await deleteMissAction(id);
+      if (result.success) {
         setMisses((prev) => prev.filter((m) => m.id !== id));
       }
-    } catch (error) {
-      console.error("Failed to delete:", error);
-    }
+    });
   }, []);
 
   // Loading state
@@ -258,6 +240,7 @@ export default function AdminPage() {
                     index={index}
                     showDelete
                     onDelete={handleDeleteMiss}
+                    disabled={isPending}
                   />
                 ))}
               </AnimatePresence>

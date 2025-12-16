@@ -3,6 +3,8 @@ import { isAuthenticated } from "@/lib/auth";
 import { deleteMiss } from "@/lib/kv";
 import { isValidId } from "@/lib/validation";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const authenticated = await isAuthenticated();

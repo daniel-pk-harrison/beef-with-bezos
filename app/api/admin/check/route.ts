@@ -8,7 +8,7 @@ export async function GET() {
     const authenticated = await isAuthenticated();
     return NextResponse.json({ authenticated });
   } catch (error) {
-    console.error("Auth check error:", error);
+    console.error("Auth check error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json({ authenticated: false });
   }
 }

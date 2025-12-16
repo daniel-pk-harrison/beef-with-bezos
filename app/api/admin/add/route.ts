@@ -3,6 +3,8 @@ import { isAuthenticated } from "@/lib/auth";
 import { addMiss, getMissCount } from "@/lib/kv";
 import { validateMissInput, MAX_RECORDS } from "@/lib/validation";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const authenticated = await isAuthenticated();
