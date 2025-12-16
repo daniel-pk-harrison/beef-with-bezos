@@ -43,21 +43,21 @@ export function MissCard({
 }: MissCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="group relative bg-white/5 backdrop-blur-sm border border-rage-900/30 rounded-lg p-4 hover:bg-white/10 hover:border-rage-700/50 transition-all duration-300"
+      transition={{ delay: index * 0.05 }}
+      className="group relative bg-white/5 backdrop-blur-sm border border-rage-900/30 rounded-lg p-3 sm:p-4 hover:bg-white/10 hover:border-rage-700/50 transition-all duration-300"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
             <span className="text-rage-400 font-mono text-sm">
               #{index + 1}
             </span>
             <span className="text-white/60 text-sm">
               {formatDate(miss.date)}
             </span>
-            <span className="text-white/40 text-xs">
+            <span className="text-white/40 text-xs hidden sm:inline">
               ({getRelativeTime(miss.date)})
             </span>
           </div>

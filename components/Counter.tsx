@@ -55,7 +55,7 @@ export function Counter({ count }: CounterProps) {
             : {}
         }
       >
-        <motion.span className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-rage-400 via-rage-500 to-rage-700 counter-glow leading-none">
+        <motion.span className="text-[7rem] sm:text-[10rem] md:text-[14rem] lg:text-[18rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-rage-400 via-rage-500 to-rage-700 counter-glow leading-none">
           <motion.span>{displayValue}</motion.span>
         </motion.span>
       </motion.div>
@@ -63,7 +63,7 @@ export function Counter({ count }: CounterProps) {
       {/* Fire emoji decorations for high counts */}
       {count >= 5 && (
         <motion.div
-          className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-4xl md:text-6xl"
+          className="absolute -top-4 sm:-top-8 left-1/2 transform -translate-x-1/2 text-2xl sm:text-4xl md:text-6xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}

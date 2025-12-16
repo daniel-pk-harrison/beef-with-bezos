@@ -15,7 +15,7 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
   const recentMisses = initialMisses.slice(0, 5);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-rage-900/20 rounded-full blur-3xl" />
@@ -24,9 +24,9 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
 
       {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.3 }}
         className="text-center mb-4 relative z-10"
       >
         <h1 className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight">
@@ -39,10 +39,10 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
 
       {/* Main Counter */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative z-10 my-8"
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="relative z-10 my-4 sm:my-8"
       >
         <Counter count={count} />
       </motion.div>
@@ -51,8 +51,8 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-3xl md:text-4xl font-bold text-white/70 -mt-4 mb-4 relative z-10"
+        transition={{ delay: 0.2 }}
+        className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/70 -mt-2 sm:-mt-4 mb-4 relative z-10"
       >
         {count === 1 ? "time" : "times"}
       </motion.p>
@@ -61,8 +61,8 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="relative z-10 mb-12"
+        transition={{ delay: 0.3 }}
+        className="relative z-10 mb-8 sm:mb-12"
       >
         <SarcasticTagline count={count} />
       </motion.div>
@@ -70,10 +70,10 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
       {/* Recent misses timeline */}
       {recentMisses.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="w-full max-w-lg relative z-10"
+          transition={{ delay: 0.4 }}
+          className="w-full max-w-lg relative z-10 px-1"
         >
           <h2 className="text-lg font-semibold text-white/70 mb-4 text-center">
             Recent Incidents
@@ -95,8 +95,8 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
       <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.1 }}
-        className="absolute bottom-4 text-center text-white/30 text-xs"
+        transition={{ delay: 0.5 }}
+        className="mt-8 sm:mt-0 sm:absolute sm:bottom-4 text-center text-white/30 text-xs pb-4 sm:pb-0"
       >
         Tracking the chaos, one missed delivery at a time.
       </motion.footer>
