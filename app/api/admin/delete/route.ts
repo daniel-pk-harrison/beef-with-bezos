@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";
 import { deleteMiss } from "@/lib/kv";
 import { isValidId } from "@/lib/validation";
@@ -34,6 +35,8 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+
+    revalidatePath("/");
 
     return NextResponse.json({ success: true });
   } catch (error) {

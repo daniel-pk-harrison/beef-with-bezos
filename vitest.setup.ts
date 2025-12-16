@@ -16,6 +16,12 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
+// Mock Next.js cache functions
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
+}));
+
 // Mock @vercel/kv
 vi.mock("@vercel/kv", () => ({
   kv: {
