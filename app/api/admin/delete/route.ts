@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { deleteMiss } from "@/lib/kv";
+import { isValidId } from "@/lib/validation";
 
 export async function POST(request: Request) {
   try {
@@ -13,11 +14,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { id } = await request.json();
+    const body = await request.json();
+    const { id } = body;
 
-    if (!id || typeof id !== "string") {
+    if (!isValidId(id)) {
       return NextResponse.json(
-        { error: "ID is required" },
+        { error: "Invalid ID format" },
         { status: 400 }
       );
     }
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete miss error:", error);
+    console.error("Delete miss error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
       { error: "Failed to delete missed delivery" },
       { status: 500 }

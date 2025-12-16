@@ -5,7 +5,10 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(gh auth:*)",
-      "Bash(brew install:*)"
+      "Bash(brew install:*)",
+      "Bash(tree:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm audit:*)"
     ]
   }
 }

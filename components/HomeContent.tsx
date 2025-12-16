@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Counter } from "./Counter";
 import { SarcasticTagline } from "./SarcasticTagline";
 import { MissCard } from "./MissCard";
@@ -68,28 +67,12 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
         <SarcasticTagline count={count} />
       </motion.div>
 
-      {/* Admin button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9 }}
-        className="relative z-10 mb-12"
-      >
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 bg-rage-600/20 hover:bg-rage-600/40 border border-rage-600/50 hover:border-rage-500 text-rage-300 hover:text-rage-200 px-6 py-3 rounded-full font-medium transition-all duration-200 transform hover:scale-105"
-        >
-          <span>Report a Miss</span>
-          <span className="text-xl">📦</span>
-        </Link>
-      </motion.div>
-
       {/* Recent misses timeline */}
       {recentMisses.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1 }}
+          transition={{ delay: 0.9 }}
           className="w-full max-w-lg relative z-10"
         >
           <h2 className="text-lg font-semibold text-white/70 mb-4 text-center">
@@ -112,7 +95,7 @@ export function HomeContent({ initialMisses }: HomeContentProps) {
       <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.3 }}
+        transition={{ delay: 1.1 }}
         className="absolute bottom-4 text-center text-white/30 text-xs"
       >
         Tracking the chaos, one missed delivery at a time.

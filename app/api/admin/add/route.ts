@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { addMiss } from "@/lib/kv";
+import { addMiss, getMissCount } from "@/lib/kv";
+import { validateMissInput, MAX_RECORDS } from "@/lib/validation";
 
 export async function POST(request: Request) {
   try {
@@ -13,19 +14,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const { date, note } = await request.json();
-
-    if (!date || typeof date !== "string") {
+    // Check record limit before adding
+    const currentCount = await getMissCount();
+    if (currentCount >= MAX_RECORDS) {
       return NextResponse.json(
-        { error: "Date is required" },
+        { error: `Maximum record limit (${MAX_RECORDS}) reached. Delete some records first.` },
         { status: 400 }
       );
     }
 
-    const missedDelivery = await addMiss(date, note ?? "");
+    const body = await request.json();
+    const validation = validateMissInput(body);
+
+    if (!validation.valid || !validation.data) {
+      return NextResponse.json(
+        { error: validation.error },
+        { status: 400 }
+      );
+    }
+
+    const { date, note } = validation.data;
+    const missedDelivery = await addMiss(date, note);
+
     return NextResponse.json({ success: true, miss: missedDelivery });
   } catch (error) {
-    console.error("Add miss error:", error);
+    console.error("Add miss error:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
       { error: "Failed to add missed delivery" },
       { status: 500 }

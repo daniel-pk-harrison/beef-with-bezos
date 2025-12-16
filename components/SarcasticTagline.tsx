@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface SarcasticTaglineProps {
   count: number;
@@ -71,11 +71,13 @@ export function SarcasticTagline({ count }: SarcasticTaglineProps) {
   const [currentTagline, setCurrentTagline] = useState("");
   const [taglineIndex, setTaglineIndex] = useState(0);
 
-  const taglines = getTaglines(count);
+  // Memoize taglines to prevent unnecessary recalculations
+  const taglines = useMemo(() => getTaglines(count), [count]);
 
   useEffect(() => {
     // Set initial tagline
     setCurrentTagline(taglines[0]);
+    setTaglineIndex(0);
 
     // Rotate taglines every 5 seconds
     const interval = setInterval(() => {
@@ -87,7 +89,7 @@ export function SarcasticTagline({ count }: SarcasticTaglineProps) {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [count]); // Re-initialize when count changes
+  }, [taglines]);
 
   return (
     <div className="h-16 md:h-20 flex items-center justify-center">
@@ -100,7 +102,7 @@ export function SarcasticTagline({ count }: SarcasticTaglineProps) {
           transition={{ duration: 0.5 }}
           className="text-lg md:text-2xl text-rage-300/80 text-center font-medium italic px-4"
         >
-          "{currentTagline}"
+          &ldquo;{currentTagline}&rdquo;
         </motion.p>
       </AnimatePresence>
     </div>
