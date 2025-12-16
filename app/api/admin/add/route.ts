@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/auth";
 import { addMiss, getMissCount } from "@/lib/kv";
 import { validateMissInput, MAX_RECORDS } from "@/lib/validation";
@@ -37,6 +38,9 @@ export async function POST(request: Request) {
 
     const { date, note } = validation.data;
     const missedDelivery = await addMiss(date, note);
+
+    // Bust the cache so the new miss shows immediately
+    revalidatePath("/");
 
     return NextResponse.json({ success: true, miss: missedDelivery });
   } catch (error) {
