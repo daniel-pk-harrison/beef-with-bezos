@@ -44,5 +44,13 @@ class MemoryKVStore implements KVStore {
   }
 }
 
-// Singleton instance
-export const memoryKV = new MemoryKVStore();
+// Use globalThis to persist across module reloads in Next.js development
+const globalForKV = globalThis as typeof globalThis & {
+  memoryKV: MemoryKVStore | undefined;
+};
+
+export const memoryKV = globalForKV.memoryKV ?? new MemoryKVStore();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForKV.memoryKV = memoryKV;
+}
