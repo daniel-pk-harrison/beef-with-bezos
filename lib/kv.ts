@@ -1,30 +1,21 @@
-import { kv } from "@vercel/kv";
 import { nanoid } from "nanoid";
 import type { MissedDelivery } from "@/types";
 import { MAX_RECORDS } from "./validation";
+import { getKV, isKVConfigured } from "./kv/index";
 
 const MISSES_KEY = "misses";
 const LOCK_KEY = "misses_lock";
 const LOCK_TIMEOUT = 5000; // 5 seconds
-
-// In-memory fallback for local development
-let localMisses: MissedDelivery[] = [];
-
-function isKvConfigured(): boolean {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
 
 /**
  * Acquire a simple distributed lock using KV.
  * Returns true if lock acquired, false otherwise.
  */
 async function acquireLock(): Promise<boolean> {
-  if (!isKvConfigured()) return true; // No lock needed for local
+  if (!isKVConfigured()) return true; // No lock needed for local
 
   try {
-    // NX = only set if not exists, PX = expire in milliseconds
-    const result = await kv.set(LOCK_KEY, Date.now(), { nx: true, px: LOCK_TIMEOUT });
-    return result === "OK";
+    return await getKV().setNX(LOCK_KEY, Date.now(), LOCK_TIMEOUT);
   } catch {
     return false;
   }
@@ -34,10 +25,10 @@ async function acquireLock(): Promise<boolean> {
  * Release the distributed lock.
  */
 async function releaseLock(): Promise<void> {
-  if (!isKvConfigured()) return;
+  if (!isKVConfigured()) return;
 
   try {
-    await kv.del(LOCK_KEY);
+    await getKV().del(LOCK_KEY);
   } catch {
     // Ignore release errors - lock will expire anyway
   }
@@ -68,12 +59,8 @@ async function withLock<T>(operation: () => Promise<T>): Promise<T> {
 }
 
 export async function getMisses(): Promise<MissedDelivery[]> {
-  if (!isKvConfigured()) {
-    return localMisses;
-  }
-
   try {
-    const misses = await kv.get<MissedDelivery[]>(MISSES_KEY);
+    const misses = await getKV().get<MissedDelivery[]>(MISSES_KEY);
     return misses ?? [];
   } catch (error) {
     console.error("Failed to get misses from KV:", error instanceof Error ? error.message : "Unknown error");
@@ -92,15 +79,6 @@ export async function addMiss(
     createdAt: Date.now(),
   };
 
-  if (!isKvConfigured()) {
-    // Enforce max records for local storage too
-    if (localMisses.length >= MAX_RECORDS) {
-      throw new Error(`Maximum record limit (${MAX_RECORDS}) reached`);
-    }
-    localMisses = [newMiss, ...localMisses];
-    return newMiss;
-  }
-
   return withLock(async () => {
     const misses = await getMisses();
 
@@ -110,18 +88,12 @@ export async function addMiss(
     }
 
     const updated = [newMiss, ...misses];
-    await kv.set(MISSES_KEY, updated);
+    await getKV().set(MISSES_KEY, updated);
     return newMiss;
   });
 }
 
 export async function deleteMiss(id: string): Promise<boolean> {
-  if (!isKvConfigured()) {
-    const before = localMisses.length;
-    localMisses = localMisses.filter((m) => m.id !== id);
-    return localMisses.length < before;
-  }
-
   return withLock(async () => {
     const misses = await getMisses();
     const filtered = misses.filter((m) => m.id !== id);
@@ -130,7 +102,7 @@ export async function deleteMiss(id: string): Promise<boolean> {
       return false; // Nothing was deleted
     }
 
-    await kv.set(MISSES_KEY, filtered);
+    await getKV().set(MISSES_KEY, filtered);
     return true;
   });
 }
