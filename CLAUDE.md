@@ -45,5 +45,5 @@ To add a new KV provider, implement the `KVStore` interface and update `lib/kv/i
 ### Environment Variables
 
 See `.env.example`:
-- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis credentials (optional for local dev)
+- `KV_REST_API_URL` / `KV_REST_API_TOKEN` - KV store credentials (optional for local dev)
 - `ADMIN_PASSWORD` - Password for admin access (defaults to "bezos123" locally)
