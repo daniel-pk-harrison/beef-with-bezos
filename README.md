@@ -1,6 +1,6 @@
-# Beef with Bezos
+# [Beef with Bezos](https://www.beefwithbezos.com)
 
-A public tracker for Amazon missed deliveries. Because someone needs to keep count.
+A public tracker for Amazon missed deliveries. Because someone needs to keep count. https://www.beefwithbezos.com
 
 ## Tech Stack
 
